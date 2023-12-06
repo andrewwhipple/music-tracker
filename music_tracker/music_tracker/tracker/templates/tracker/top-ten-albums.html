@@ -1,0 +1,17 @@
+{% extends "tracker/index.html" %}
+
+{% block page_title %}{{list_title}}{% endblock %}
+
+
+{% block content %}
+<h1>{{list_title}}</h1>
+<hr>
+
+<p><em>Honorable Mentions: {% for album in honorable_mentions %} {{album.album_title}} - {{album.artist}};{% endfor %}</em></p>
+
+<hr>
+
+{% for album in top_ten %}
+<h5>#{{album.rank}}: {{album.album_title}} - {{album.artist}}</h5>
+{% endfor %}
+{% endblock %}

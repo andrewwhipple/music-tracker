@@ -1,0 +1,7 @@
+music_tracker/.env
+.python-version
+music_tracker/db.sqlite3
+*/*/__pycache__/*
+*/*/*/__pycache__/*
+*/*/*/*/__pycache__/*
+music_tracker/static/*

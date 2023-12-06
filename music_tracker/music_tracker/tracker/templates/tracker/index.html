@@ -1,0 +1,18 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'tracker/normalize.css' %}">
+<link rel="stylesheet" href="{% static 'tracker/skeleton.css' %}">
+<link rel="stylesheet" href="{% static 'tracker/styles.css' %}">
+<title>{% block page_title %}Andrew's Music Tracking{% endblock %}</title>
+
+<div class="container">
+    <h3>Andrew's Music Tracking</h3>
+
+    {# navbar #}
+    <hr>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>

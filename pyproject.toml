@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "music-tracker"
+version = "0.1.0"
+description = ""
+authors = ["Andrew Whipple"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^5.0"
+uvicorn = "^0.24.0.post1"
+poetry-dotenv-plugin = "^0.2.0"
+pre-commit = "^3.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+exclude = [
+    "/music_tracker/tracker/migrations/",
+]

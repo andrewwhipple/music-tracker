@@ -44,7 +44,7 @@ conf-symlink:
 	sudo ln -s /etc/nginx/sites-available/music_tracker_nginx.conf /etc/nginx/sites-enabled/
 
 uwsgi:
-	make poetry-run command="uwsgi --http :${DJANGO_PORT} --chdir music_tracker/ --module music_tracker.wsgi"
+	make poetry-run command="uwsgi --socket :${DJANGO_PORT} --chdir music_tracker/ --module music_tracker.wsgi"
 
 start:
 	service nginx restart

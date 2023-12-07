@@ -38,8 +38,7 @@ pre-commit:
 
 conf:
 	# Run make env first
-	cp music_tracker/music_tracker_nginx.conf /etc/nginx/sites-available/music_tracker_nginx.conf
-	envsubst < /etc/nginx/sites-available/music_tracker_nginx.conf > /etc/nginx/sites-available/music_tracker_nginx.conf
+	envsubst < music_tracker/music_tracker_nginx.conf > /etc/nginx/sites-available/music_tracker_nginx.conf
 	sudo ln -s /etc/nginx/sites-available/music_tracker_nginx.conf /etc/nginx/sites-enabled/
 
 uwsgi:

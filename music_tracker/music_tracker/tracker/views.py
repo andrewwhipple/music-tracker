@@ -1,11 +1,14 @@
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from music_tracker.tracker.models import Album, TopTenAlbumsList
 
 
 def index(request):
-    return HttpResponse("Hello world")
+    most_recent_top_ten = (
+        TopTenAlbumsList.objects.filter(published=True).order_by("-year").first()
+    )
+
+    return redirect("top_ten", year=most_recent_top_ten.year)
 
 
 def get_navigation_links():

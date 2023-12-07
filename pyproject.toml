@@ -11,6 +11,7 @@ Django = "^5.0"
 poetry-dotenv-plugin = "^0.2.0"
 pre-commit = "^3.5.0"
 uwsgi = "^2.0.23"
+python-environ = "^0.4.54"
 
 
 [build-system]

@@ -877,6 +877,16 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "python-environ"
+version = "0.4.54"
+description = "Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application."
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-environ-0.4.54.tar.gz", hash = "sha256:6249a14057f95aba3b4906d73276f770e01e659f8098b3f3b34295feac42865b"},
+]
+
+[[package]]
 name = "pywin32-ctypes"
 version = "0.2.2"
 description = "A (partial) reimplementation of pywin32 using ctypes/cffi"
@@ -1344,4 +1354,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5a142b7767f4da82eb5b1b6223c44922fc84a40280805c113dffe86cc253742b"
+content-hash = "c8dfaa56f239325e3a9b27f3e91f70cd598ac0729f1405ad77aabb24f588ba5b"

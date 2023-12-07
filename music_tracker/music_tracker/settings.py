@@ -26,7 +26,7 @@ FLAVOR = os.getenv("FLAVOR", "production")
 
 DEBUG = FLAVOR == "local"
 
-ALLOWED_HOSTS = [] if DEBUG == True else [os.getenv("PRODUCTION_HOST")]
+ALLOWED_HOSTS = ["*"] if DEBUG == True else os.getenv("PRODUCTION_HOSTS")
 
 
 # Application definition

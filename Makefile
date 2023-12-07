@@ -39,7 +39,7 @@ pre-commit:
 conf:
 	# Run make env first
 	envsubst < music_tracker/music_tracker_nginx.conf > /etc/nginx/sites-available/music_tracker_nginx.conf
-	
+
 conf-symlink:
 	sudo ln -s /etc/nginx/sites-available/music_tracker_nginx.conf /etc/nginx/sites-enabled/
 
@@ -49,5 +49,8 @@ uwsgi:
 start:
 	service nginx restart
 	make uwsgi
+
+find-uwsgi:
+	ps -u root | grep uwsgi
 
 .PHONY: setup, poetry, install-dependencies, add, manage, statics, runserver, superuser, env, conf, uwsgi, start

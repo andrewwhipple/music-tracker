@@ -8,6 +8,20 @@ def index(request):
     return HttpResponse("Hello world")
 
 
+def get_navigation_links():
+    top_ten_lists = TopTenAlbumsList.objects.filter(published=True).order_by("year")
+
+    return {
+        "top_tens": [
+            {
+                "title": top_ten_list.title,
+                "year": top_ten_list.year,
+            }
+            for top_ten_list in top_ten_lists
+        ]
+    }
+
+
 def top_ten_list(request, year):
     list_record = get_object_or_404(TopTenAlbumsList, year=year, published=True)
 
@@ -32,5 +46,6 @@ def top_ten_list(request, year):
             }
             for album in honorable_mentions_records
         ],
+        "navigation": get_navigation_links(),
     }
     return render(request, "tracker/top-ten-albums.html", context)

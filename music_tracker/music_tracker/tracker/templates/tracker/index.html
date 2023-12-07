@@ -8,7 +8,23 @@
 <div class="container">
     <h4>Andrew's Music Tracking</h4> {# make this a link #}
 
-    {# navbar #}
+
+    <div class="row">
+        {% for nav_category in navigation %}
+        <div class="column">
+            <div class="dropdown">
+                {% if nav_category == "top_tens" %}
+                <button class="dropdown-button">Top Ten Albums of the Year</button>
+                <div class="dropdown-content">
+                    {% for link in navigation.top_tens %} <a href="/albums/{{link.year}}">{{link.title}}</a> {% endfor %}
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
     <hr>
 
     <div class="container">

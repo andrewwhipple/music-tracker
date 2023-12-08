@@ -34,6 +34,7 @@ def top_ten_list(request, year):
 
     context = {
         "list_title": list_record.title,
+        "year": list_record.year,
         "top_ten": [
             {
                 "album_title": album.title,

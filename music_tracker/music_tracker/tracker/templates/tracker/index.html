@@ -1,34 +1,37 @@
+
 {% load static %}
 
-<link rel="stylesheet" href="{% static 'tracker/normalize.css' %}">
-<link rel="stylesheet" href="{% static 'tracker/skeleton.css' %}">
+<link rel="stylesheet" href="{% static 'tracker/pico.min.css' %}">
 <link rel="stylesheet" href="{% static 'tracker/styles.css' %}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block page_title %}Andrew's Music Tracking{% endblock %}</title>
 
-<div class="container">
+<header>
+    <div class="container">
     <h4>Andrew's Music Tracking</h4> {# make this a link #}
-
-
-    <div class="row">
+    <nav>
         {% for nav_category in navigation %}
-        <div class="column">
-            <div class="dropdown">
+        <ul>
+            <li>
+              <details class="nav-category" role="list" dir="rtl">
                 {% if nav_category == "top_tens" %}
-                <button class="dropdown-button">Top Ten Albums of the Year</button>
-                <div class="dropdown-content">
-                    {% for link in navigation.top_tens %} <a href="/albums/{{link.year}}">{{link.title}}</a> {% endfor %}
-                </div>
+                <summary aria-haspopup="listbox" role="link">Top Ten Albums of the Year</summary>
+                <ul role="listbox">
+                    {% for link in navigation.top_tens %} <li><a href="/albums/{{link.year}}">{{link.title}}</a></li> {% endfor %}
+                </ul>
                 {% endif %}
+              </details>
+            </li>
+          </ul>
 
-            </div>
-        </div>
         {% endfor %}
-    </div>
-
+    </nav>
     <hr>
-
+    </div>
+</header>
+<main>
     <div class="container">
         {% block content %}
         {% endblock %}
     </div>
-</div>
+</main>

@@ -77,9 +77,11 @@ class TopTenAlbumsList(List):
 class Song(models.Model):
     id = UUIDPKField()
     title = models.CharField(max_length=250)
-    year = YearField()
-    album = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True)
-    artists = models.ManyToManyField(Artist, null=True)
+    year = YearField(null=True, blank=True, default=None)
+    album = models.ForeignKey(
+        Album, on_delete=models.SET_NULL, null=True, blank=True, default=None
+    )
+    artists = models.ManyToManyField(Artist, null=True, blank=True, default=None)
 
     def __str__(self) -> str:
         return self.title

@@ -84,7 +84,6 @@ def obsessions_list(request, year):
                 "artists": ", ".join(
                     [str(a) for a in obsession.song.artists.all().order_by("name")]
                 ),
-                "album": obsession.song.album.title,
             }
             for obsession in obsession_songs.all()
         ],

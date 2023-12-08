@@ -28,3 +28,20 @@ class ArtistAdmin(admin.ModelAdmin):
 class TopTenAlbumsListAdmin(admin.ModelAdmin):
     list_display = ["title", "published"]
     list_editable = ["published"]
+
+
+@admin.register(models.Song)
+class SongAdmin(admin.ModelAdmin):
+    list_display = ["title", "album", "display_artists"]
+
+
+@admin.register(models.ObsessionList)
+class ObsessionListAdmin(admin.ModelAdmin):
+    list_display = ["title", "published"]
+    list_editable = ["published"]
+
+
+@admin.register(models.ObsessionSongs)
+class ObsessionSongAdmin(admin.ModelAdmin):
+    list_display = ["song", "obsession_list", "ordering"]
+    list_filter = ["obsession_list"]

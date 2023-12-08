@@ -1,0 +1,13 @@
+{% extends "tracker/index.html" %}
+
+{% block page_title %}{{list_title}}{% endblock %}
+
+
+{% block content %}
+<h1><a class="list-title" href="/obsessions/{{year}}">{{list_title}}</a></h1>
+<hr>
+
+{% for song in songs %}
+<p class="list-item">{{song.title}} ({{song.album}}) - {{song.artists}}</p>
+{% endfor %}
+{% endblock %}

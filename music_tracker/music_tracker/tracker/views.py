@@ -1,6 +1,11 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
-from music_tracker.tracker.models import Album, TopTenAlbumsList
+from music_tracker.tracker.models import (
+    Album,
+    ObsessionList,
+    ObsessionSongs,
+    TopTenAlbumsList,
+)
 
 
 def index(request):
@@ -13,15 +18,23 @@ def index(request):
 
 def get_navigation_links():
     top_ten_lists = TopTenAlbumsList.objects.filter(published=True).order_by("year")
+    obsessions_lists = ObsessionList.objects.filter(published=True).order_by("year")
 
     return {
         "top_tens": [
             {
-                "title": top_ten_list.title,
-                "year": top_ten_list.year,
+                "title": list.title,
+                "year": list.year,
             }
-            for top_ten_list in top_ten_lists
-        ]
+            for list in top_ten_lists
+        ],
+        "obsessions": [
+            {
+                "title": list.title,
+                "year": list.year,
+            }
+            for list in obsessions_lists
+        ],
     }
 
 
@@ -53,3 +66,29 @@ def top_ten_list(request, year):
         "navigation": get_navigation_links(),
     }
     return render(request, "tracker/top-ten-albums.html", context)
+
+
+def obsessions_list(request, year):
+    list_record = get_object_or_404(ObsessionList, year=year, published=True)
+
+    obsession_songs = ObsessionSongs.objects.filter(
+        obsession_list=list_record.id
+    ).order_by("ordering")
+
+    context = {
+        "list_title": list_record.title,
+        "year": list_record.year,
+        "songs": [
+            {
+                "title": obsession.song.title,
+                "artists": ", ".join(
+                    [str(a) for a in obsession.song.artists.all().order_by("name")]
+                ),
+                "album": obsession.song.album.title,
+            }
+            for obsession in obsession_songs.all()
+        ],
+        "navigation": get_navigation_links(),
+    }
+
+    return render(request, "tracker/obsessions.html", context)

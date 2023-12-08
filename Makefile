@@ -30,6 +30,12 @@ runserver:
 superuser:
 	make manage command=createsuperuser
 
+makemigrations:
+	make manage command=makemigrations
+
+migrate:
+	make manage command=migrate
+
 env:
 	echo "run bash env.sh"
 
@@ -53,4 +59,4 @@ start:
 find-uwsgi:
 	ps -u root | grep uwsgi
 
-.PHONY: setup, poetry, install-dependencies, add, manage, statics, runserver, superuser, env, conf, uwsgi, start
+.PHONY: setup, poetry, install-dependencies, add, manage, statics, runserver, superuser, env, pre-commit, conf, conf-symlink, uwsgi, start, find-uwsgi

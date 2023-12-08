@@ -10,21 +10,26 @@
     <div class="container">
     <h4>Andrew's Music Tracking</h4> {# make this a link #}
     <nav>
-        {% for nav_category in navigation %}
         <ul>
+          {% for nav_category in navigation %}
             <li>
-              <details class="nav-category" role="list" dir="rtl">
+              <details class="nav-category" role="list">
                 {% if nav_category == "top_tens" %}
                 <summary aria-haspopup="listbox" role="link">Top Ten Albums of the Year</summary>
                 <ul role="listbox">
                     {% for link in navigation.top_tens %} <li><a href="/albums/{{link.year}}">{{link.title}}</a></li> {% endfor %}
                 </ul>
                 {% endif %}
+                {% if nav_category == "obsessions" %}
+                <summary aria-haspopup="listbox" role="link">Annual Obsessions</summary>
+                <ul role="listbox">
+                    {% for link in navigation.obsessions %} <li><a href="/obsessions/{{link.year}}">{{link.title}}</a></li> {% endfor %}
+                </ul>
+                {% endif %}
               </details>
             </li>
+            {% endfor %}
           </ul>
-
-        {% endfor %}
     </nav>
     <hr>
     </div>

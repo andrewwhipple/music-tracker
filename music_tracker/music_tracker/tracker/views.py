@@ -102,10 +102,12 @@ def obsessions_stats(request):
     by_artist = all_songs.values("song__artists__name")
 
     song_count = by_artist.annotate(Count("song_id", distinct=True)).order_by(
-        "-song_id__count"
+        "-song_id__count",
+        "song__artists__name",
     )
     list_count = by_artist.annotate(Count("obsession_list_id", distinct=True)).order_by(
-        "-obsession_list_id__count"
+        "-obsession_list_id__count",
+        "song__artists__name",
     )
 
     context = {

@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 
 from music_tracker.tracker.models import (
@@ -69,6 +70,9 @@ def top_ten_list(request, year):
 
 
 def obsessions_list(request, year):
+    if year == "stats":
+        return obsessions_stats(request)
+
     list_record = get_object_or_404(ObsessionList, year=year, published=True)
 
     obsession_songs = ObsessionSongs.objects.filter(
@@ -91,3 +95,36 @@ def obsessions_list(request, year):
     }
 
     return render(request, "tracker/obsessions.html", context)
+
+
+def obsessions_stats(request):
+    all_songs = ObsessionSongs.objects.filter(obsession_list__published=True)
+    by_artist = all_songs.values("song__artists__name")
+
+    song_count = by_artist.annotate(Count("song_id", distinct=True)).order_by(
+        "-song_id__count"
+    )
+    list_count = by_artist.annotate(Count("obsession_list_id", distinct=True)).order_by(
+        "-obsession_list_id__count"
+    )
+
+    context = {
+        "page_title": "Obsessions Stats",
+        "by_songs": [
+            {
+                "name": record["song__artists__name"],
+                "songs": record["song_id__count"],
+            }
+            for record in song_count.all()
+        ],
+        "by_years": [
+            {
+                "name": record["song__artists__name"],
+                "years": record["obsession_list_id__count"],
+            }
+            for record in list_count.all()
+        ],
+        "navigation": get_navigation_links(),
+    }
+
+    return render(request, "tracker/obsessions-stats.html", context)

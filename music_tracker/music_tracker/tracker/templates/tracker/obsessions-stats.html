@@ -1,0 +1,36 @@
+{% extends "tracker/index.html" %}
+
+{% block page_title %}{{list_title}}{% endblock %}
+
+
+{% block content %}
+<h1><a class="page-title" href="/obsessions/stats">{{page_title}}</a></h1>
+<hr>
+
+<table>
+    <tr>
+        <th>Artist</th>
+        <th># of songs (across all years)</th>
+    </tr>
+    {% for artist in by_songs %}
+    <tr>
+        <td>{{artist.name}}</td>
+        <td>{{artist.songs}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<table>
+    <tr>
+        <th>Artist</th>
+        <th># of years (with at least 1 song)</th>
+    </tr>
+    {% for artist in by_years %}
+    <tr>
+        <td>{{artist.name}}</td>
+        <td>{{artist.years}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

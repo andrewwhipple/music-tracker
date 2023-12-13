@@ -138,12 +138,19 @@ def artist_stats(request, id):
 
     # Show a table of each top ten year and whether they have albums in the list or honorable mentions
     albums = Album.objects.filter(artist=artist_record.id, listened=True)
+    published_top_tens = list(
+        TopTenAlbumsList.objects.filter(published=True).values_list("year", flat=True)
+    )
 
-    charted = albums.filter(rank__lt=11).order_by("year", "rank")
-    honorable_mentions = albums.filter(rank__isnull=False, rank__gt=10).order_by(
+    charted = albums.filter(rank__lt=11, year__in=published_top_tens).order_by(
         "year", "rank"
     )
-    other_albums = albums.filter(rank__isnull=True).order_by("year", "title")
+    honorable_mentions = albums.filter(
+        rank__isnull=False, rank__gt=10, year__in=published_top_tens
+    ).order_by("year", "rank")
+    other_albums = albums.filter(
+        rank__isnull=True, year__in=published_top_tens
+    ).order_by("year", "title")
 
     context = {
         "artist_name": artist_record.name,

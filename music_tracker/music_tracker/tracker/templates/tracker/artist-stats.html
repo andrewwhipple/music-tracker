@@ -29,6 +29,9 @@
     {% endfor %}
 </ul>
 {% endif %}
+{% if not albums.charted and not albums.honorable_mentions %}
+<p>None!</p>
+{% endif %}
 
 {% if albums.other_albums %}
 <h3>Other Albums</h3>

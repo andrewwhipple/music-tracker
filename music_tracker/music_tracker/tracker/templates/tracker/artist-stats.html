@@ -1,0 +1,42 @@
+{% extends "tracker/index.html" %}
+
+{% block page_title %}{{artist_name}}{% endblock %}
+
+
+{% block content %}
+<h1><a class="list-title" href="/artist/{{artist_id}}">{{artist_name}}</a></h1>
+<hr>
+
+<h2>Albums</h2>
+
+<h3>Albums on top ten lists</h3>
+
+{% if albums.charted %}
+<h4>Top Tens</h4>
+<ul>
+
+    {% for album in albums.charted %}
+    <li>{{album.title}} - #{{album.rank}}, <a href="/albums/{{album.year}}">{{album.year}}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if albums.honorable_mentions %}
+<h4>Honorable Mentions</h4>
+<ul>
+    {% for album in albums.honorable_mentions %}
+    <li>{{album.title}} - <a href="/albums/{{album.year}}">{{album.year}}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if albums.other_albums %}
+<h3>Other Albums</h3>
+<ul>
+    {% for album in albums.other_albums %}
+    <li>{{album.title}} - {{album.year}}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

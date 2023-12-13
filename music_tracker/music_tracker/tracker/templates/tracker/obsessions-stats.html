@@ -4,14 +4,14 @@
 
 
 {% block content %}
-<h1><a class="page-title" href="/obsessions/stats">{{page_title}}</a></h1>
+<h1><a class="list-title" href="/obsessions/stats">{{page_title}}</a></h1>
 <hr>
 
 <h2>By Number of Songs</h2>
 <table>
     <tr>
-        <th>Artist</th>
-        <th># of songs (across all years)</th>
+        <th><b>Artist</b></th>
+        <th><b># of songs (across all years)</b></th>
     </tr>
     {% for artist in by_songs %}
     <tr>
@@ -26,8 +26,8 @@
 <h2>By Number Of Years</h2>
 <table>
     <tr>
-        <th>Artist</th>
-        <th># of years (with at least 1 song)</th>
+        <th><b>Artist</b></th>
+        <th><b># of years (with at least 1 song)</b></th>
     </tr>
     {% for artist in by_years %}
     <tr>

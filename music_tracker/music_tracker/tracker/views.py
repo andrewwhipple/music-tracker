@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from music_tracker.tracker.models import (
     Album,
+    Artist,
     ObsessionList,
     ObsessionSongs,
     TopTenAlbumsList,
@@ -130,3 +131,49 @@ def obsessions_stats(request):
     }
 
     return render(request, "tracker/obsessions-stats.html", context)
+
+
+def artist_stats(request, id):
+    artist_record = get_object_or_404(Artist, id=id)
+
+    # Show a table of each top ten year and whether they have albums in the list or honorable mentions
+    albums = Album.objects.filter(artist=artist_record.id, listened=True)
+
+    charted = albums.filter(rank__lt=11).order_by("year", "rank")
+    honorable_mentions = albums.filter(rank__isnull=False, rank__gt=10).order_by(
+        "year", "rank"
+    )
+    other_albums = albums.filter(rank__isnull=True).order_by("year", "title")
+
+    context = {
+        "artist_name": artist_record.name,
+        "artist_id": artist_record.id,
+        "albums": {
+            "charted": [
+                {
+                    "title": album.title,
+                    "year": album.year,
+                    "rank": album.rank,
+                }
+                for album in charted.all()
+            ],
+            "honorable_mentions": [
+                {
+                    "title": album.title,
+                    "year": album.year,
+                }
+                for album in honorable_mentions.all()
+            ],
+            "other_albums": [
+                {
+                    "title": album.title,
+                    "year": album.year,
+                }
+                for album in other_albums
+            ],
+        },
+    }
+
+    return render(request, "tracker/artist-stats.html", context)
+
+    # Show a table of which years they have songs on the obsessions list

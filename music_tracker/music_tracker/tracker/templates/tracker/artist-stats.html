@@ -42,4 +42,17 @@
 </ul>
 {% endif %}
 
+<h2>Obsession List Stats</h2>
+
+<p><b>Songs across all lists:</b> {{obsessions.song_count}}</p>
+<p><b>Number of lists:</b> {{obsessions.list_count}}</p>
+{% if obsessions.lists %}
+<ul>
+    {% for song_list in obsessions.lists %}
+    <li><a href="/obsessions/{{song_list.year}}">{{song_list.year}}</a> - {{song_list.song_count}}</li>
+    {% endfor %}
+</ul>
+
+{% endif %}
+
 {% endblock %}

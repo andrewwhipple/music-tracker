@@ -152,6 +152,21 @@ def artist_stats(request, id):
         rank__isnull=True, year__in=published_top_tens
     ).order_by("year", "title")
 
+    # Show a table of which years they have songs on the obsessions list
+    obsession_list_songs = ObsessionSongs.objects.filter(
+        obsession_list_id__published=True, song__artists=artist_record.id
+    ).order_by()
+
+    song_count = obsession_list_songs.aggregate(Count("song_id", distinct=True))
+    list_count = obsession_list_songs.aggregate(
+        Count("obsession_list_id", distinct=True)
+    )
+
+    by_year = obsession_list_songs.values("obsession_list_id__year")
+    song_count_by_year = by_year.annotate(Count("song_id")).order_by(
+        "obsession_list_id__year"
+    )
+
     context = {
         "artist_name": artist_record.name,
         "artist_id": artist_record.id,
@@ -179,8 +194,18 @@ def artist_stats(request, id):
                 for album in other_albums
             ],
         },
+        "obsessions": {
+            "song_count": song_count["song_id__count"],
+            "list_count": list_count["obsession_list_id__count"],
+            # "list_count": song_count_by_year,
+            "lists": [
+                {
+                    "year": obsession_list["obsession_list_id__year"],
+                    "song_count": obsession_list["song_id__count"],
+                }
+                for obsession_list in song_count_by_year
+            ],
+        },
     }
 
     return render(request, "tracker/artist-stats.html", context)
-
-    # Show a table of which years they have songs on the obsessions list

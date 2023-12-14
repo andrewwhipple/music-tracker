@@ -15,7 +15,7 @@
     </tr>
     {% for artist in by_songs %}
     <tr>
-        <td>{{artist.name}}</td>
+        <td><a href="/artist/{{artist.id}}">{{artist.name}}</a></td>
         <td>{{artist.songs}}</td>
     </tr>
     {% endfor %}
@@ -31,7 +31,7 @@
     </tr>
     {% for artist in by_years %}
     <tr>
-        <td>{{artist.name}}</td>
+        <td><a href="/artist/{{artist.id}}">{{artist.name}}</a></td>
         <td>{{artist.years}}</td>
     </tr>
     {% endfor %}

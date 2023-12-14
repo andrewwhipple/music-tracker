@@ -22,21 +22,27 @@ def get_navigation_links():
     top_ten_lists = TopTenAlbumsList.objects.filter(published=True).order_by("year")
     obsessions_lists = ObsessionList.objects.filter(published=True).order_by("year")
 
+    top_ten_links = [
+        {
+            "title": list.title,
+            "year": list.year,
+        }
+        for list in top_ten_lists
+    ]
+
+    obsession_links = [
+        {
+            "title": list.title,
+            "year": list.year,
+        }
+        for list in obsessions_lists
+    ]
+
+    obsession_links.append({"title": "Obsession Stats", "year": "stats"})
+
     return {
-        "top_tens": [
-            {
-                "title": list.title,
-                "year": list.year,
-            }
-            for list in top_ten_lists
-        ],
-        "obsessions": [
-            {
-                "title": list.title,
-                "year": list.year,
-            }
-            for list in obsessions_lists
-        ],
+        "top_tens": top_ten_links,
+        "obsessions": obsession_links,
     }
 
 
@@ -86,6 +92,9 @@ def obsessions_list(request, year):
         "songs": [
             {
                 "title": obsession.song.title,
+                "les_artistes": [
+                    artist for artist in obsession.song.artists.all().order_by("name")
+                ],
                 "artists": ", ".join(
                     [str(a) for a in obsession.song.artists.all().order_by("name")]
                 ),
@@ -100,7 +109,7 @@ def obsessions_list(request, year):
 
 def obsessions_stats(request):
     all_songs = ObsessionSongs.objects.filter(obsession_list__published=True)
-    by_artist = all_songs.values("song__artists__name")
+    by_artist = all_songs.values("song__artists__name", "song__artists__id")
 
     song_count = by_artist.annotate(Count("song_id", distinct=True)).order_by(
         "-song_id__count",
@@ -116,6 +125,7 @@ def obsessions_stats(request):
         "by_songs": [
             {
                 "name": record["song__artists__name"],
+                "id": record["song__artists__id"],
                 "songs": record["song_id__count"],
             }
             for record in song_count.all()
@@ -123,6 +133,7 @@ def obsessions_stats(request):
         "by_years": [
             {
                 "name": record["song__artists__name"],
+                "id": record["song__artists__id"],
                 "years": record["obsession_list_id__count"],
             }
             for record in list_count.all()
@@ -197,7 +208,6 @@ def artist_stats(request, id):
         "obsessions": {
             "song_count": song_count["song_id__count"],
             "list_count": list_count["obsession_list_id__count"],
-            # "list_count": song_count_by_year,
             "lists": [
                 {
                     "year": obsession_list["obsession_list_id__year"],
@@ -206,6 +216,7 @@ def artist_stats(request, id):
                 for obsession_list in song_count_by_year
             ],
         },
+        "navigation": get_navigation_links(),
     }
 
     return render(request, "tracker/artist-stats.html", context)

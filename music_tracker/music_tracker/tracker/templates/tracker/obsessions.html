@@ -8,6 +8,8 @@
 <hr>
 
 {% for song in songs %}
-<p class="list-item">{{song.title}} - {{song.artists}}</p>
+<p class="list-item">{{song.title}} - {% for artist in song.les_artistes %}<a href="/artist/{{artist.id}}">{{artist.name}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+
+
 {% endfor %}
 {% endblock %}

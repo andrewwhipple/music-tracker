@@ -8,12 +8,12 @@
 <hr>
 
 {% if honorable_mentions %}
-<p><em>Honorable Mentions: {% for album in honorable_mentions %}{{album.album_title}} - {% for artist in album.artists %}<a href="/artist/{{artist.id}}">{{artist}}</a>{% if not forloop.last %},{% endif %}{% endfor %}{% if not forloop.last %}; {% endif %}{% endfor %}</em></p>
+<p><em>Honorable Mentions: {% for album in honorable_mentions %}{{album.album_title}} - {% for artist in album.artists %}<a href="/artist/{{artist.id}}">{{artist}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.last %}; {% endif %}{% endfor %}</em></p>
 
 <hr>
 {% endif %}
 
 {% for album in top_ten %}
-<p class="list-item">#{{album.rank}}: {{album.album_title}} - {% for artist in album.artists %}<a href="/artist/{{artist.id}}">{{artist}}</a>{% if not forloop.last%},{% endif %}{% endfor %}</p>
+<p class="list-item">#{{album.rank}}: {{album.album_title}} - {% for artist in album.artists %}<a href="/artist/{{artist.id}}">{{artist}}</a>{% if not forloop.last%}, {% endif %}{% endfor %}</p>
 {% endfor %}
 {% endblock %}

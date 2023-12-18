@@ -8,7 +8,7 @@ from music_tracker.tracker import models
 class AlbumAdmin(admin.ModelAdmin):
     list_display = [
         "title",
-        "artist",
+        "display_artists",
         "year",
         "listened",
         "priority",

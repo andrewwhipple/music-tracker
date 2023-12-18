@@ -59,7 +59,7 @@ def top_ten_list(request, year):
         "top_ten": [
             {
                 "album_title": album.title,
-                "artist": album.artist,
+                "artists": [artist for artist in album.artists.all().order_by("name")],
                 "rank": album.rank,
             }
             for album in top_ten_records
@@ -67,7 +67,7 @@ def top_ten_list(request, year):
         "honorable_mentions": [
             {
                 "album_title": album.title,
-                "artist": album.artist,
+                "artists": [artist for artist in album.artists.all().order_by("name")],
             }
             for album in honorable_mentions_records
         ],
@@ -92,12 +92,9 @@ def obsessions_list(request, year):
         "songs": [
             {
                 "title": obsession.song.title,
-                "les_artistes": [
+                "artists": [
                     artist for artist in obsession.song.artists.all().order_by("name")
                 ],
-                "artists": ", ".join(
-                    [str(a) for a in obsession.song.artists.all().order_by("name")]
-                ),
             }
             for obsession in obsession_songs.all()
         ],
@@ -148,7 +145,7 @@ def artist_stats(request, id):
     artist_record = get_object_or_404(Artist, id=id)
 
     # Show a table of each top ten year and whether they have albums in the list or honorable mentions
-    albums = Album.objects.filter(artist=artist_record.id, listened=True)
+    albums = Album.objects.filter(artists=artist_record.id, listened=True)
     published_top_tens = list(
         TopTenAlbumsList.objects.filter(published=True).values_list("year", flat=True)
     )

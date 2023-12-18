@@ -50,15 +50,19 @@ class Album(models.Model):
     re_rating = models.IntegerField(
         choices=[(i, i) for i in range(1, 4)], null=True, default=None, blank=True
     )
-    # TODO make this unique_together with year
     rank = models.IntegerField(
         choices=[(i, i) for i in range(1, 21)], null=True, default=None, blank=True
     )
-    # TODO: make this many_to_many
-    artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True)
+    artists = models.ManyToManyField(Artist, null=True, blank=True, default=None)
 
     def __str__(self) -> str:
         return self.title
+
+    def display_artists(self):
+        return ", ".join([str(a) for a in self.artists.all()])
+
+    class Meta:
+        unique_together = [("rank", "year")]
 
 
 class List(models.Model):

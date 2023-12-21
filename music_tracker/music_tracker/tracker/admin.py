@@ -45,3 +45,15 @@ class ObsessionListAdmin(admin.ModelAdmin):
 class ObsessionSongAdmin(admin.ModelAdmin):
     list_display = ["song", "obsession_list", "ordering"]
     list_filter = ["obsession_list"]
+
+
+@admin.register(models.SpotifyTop100List)
+class SpotifyTop100ListAdmin(admin.ModelAdmin):
+    list_display = ["title", "published"]
+    list_editable = ["published"]
+
+
+@admin.register(models.SpotifyTop100Songs)
+class SpotifyTop100SongAdmin(admin.ModelAdmin):
+    list_display = ["song", "top_100_list", "ordering"]
+    list_filter = ["top_100_list"]

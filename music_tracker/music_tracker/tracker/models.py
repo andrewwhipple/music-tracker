@@ -36,6 +36,28 @@ class Artist(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def get_albums(self, **kwargs):
+        return Album.objects.filter(artists=self.id, **kwargs)
+
+    def get_listed_albums(self):
+        published_top_tens = list(
+            TopTenAlbumsList.get_published().values_list("year", flat=True)
+        )
+        albums = self.get_albums(listened=True)
+        return albums.filter(year__in=published_top_tens).order_by("year", "rank")
+
+    def get_top_ten_albums(self):
+        return self.get_listed_albums().filter(rank__lt=11)
+
+    def get_honorable_mention_albums(self):
+        return self.get_listed_albums().filter(rank__gt=10, rank__isnull=False)
+
+    def get_other_albums(self):
+        return self.get_listed_albums().filter(rank__isnull=True)
+
+    def get_obsession_list_songs(self):
+        return ObsessionSongs.get_songs().filter(song__artists=self.id)
+
 
 class Album(models.Model):
     id = UUIDPKField()
@@ -61,6 +83,18 @@ class Album(models.Model):
     def display_artists(self):
         return ", ".join([str(a) for a in self.artists.all()])
 
+    @classmethod
+    def get_ranked_albums(cls, year):
+        return cls.objects.filter(year=year, rank__isnull=False)
+
+    @classmethod
+    def get_top_ten(cls, year):
+        return cls.get_ranked_albums(year).filter(rank__lt=11).order_by("rank")
+
+    @classmethod
+    def get_honorable_mentions(cls, year):
+        return cls.get_ranked_albums(year).filter(rank__gt=10).order_by("rank")
+
     class Meta:
         unique_together = [("rank", "year")]
 
@@ -73,9 +107,17 @@ class List(models.Model):
     def __str__(self) -> str:
         return self.title
 
+    @classmethod
+    def get_published(cls):
+        return cls.objects.filter(published=True)
+
 
 class TopTenAlbumsList(List):
     year = YearField(unique=True)
+
+    @classmethod
+    def get_most_recent(cls):
+        return cls.get_published().order_by("-year").first()
 
 
 class Song(models.Model):
@@ -97,11 +139,42 @@ class Song(models.Model):
 class ObsessionList(List):
     year = YearField(unique=True)
 
+    def get_songs(self):
+        return ObsessionSongs.objects.filter(obsession_list=self.id).order_by(
+            "ordering"
+        )
+
 
 class ObsessionSongs(models.Model):
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
     obsession_list = models.ForeignKey(ObsessionList, on_delete=models.CASCADE)
     ordering = models.IntegerField()
 
+    @classmethod
+    def get_songs(cls):
+        return cls.objects.filter(obsession_list__published=True)
+
     class Meta:
         unique_together = [("ordering", "obsession_list"), ("song", "obsession_list")]
+
+
+class SpotifyTop100List(List):
+    year = YearField(unique=True)
+
+    def get_songs(self):
+        return SpotifyTop100Songs.objects.filter(top_100_list=self.id).order_by(
+            "ordering"
+        )
+
+
+class SpotifyTop100Songs(models.Model):
+    song = models.ForeignKey(Song, on_delete=models.CASCADE)
+    top_100_list = models.ForeignKey(SpotifyTop100List, on_delete=models.CASCADE)
+    ordering = models.IntegerField()
+
+    @classmethod
+    def get_songs(cls):
+        return cls.objects.filter(top_100_list__published=True)
+
+    class Meta:
+        unique_together = [("ordering", "top_100_list"), ("song", "top_100_list")]

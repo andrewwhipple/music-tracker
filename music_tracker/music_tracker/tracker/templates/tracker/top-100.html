@@ -1,0 +1,15 @@
+{% extends "tracker/index.html" %}
+
+{% block page_title %}{{list_title}}{% endblock %}
+
+
+{% block content %}
+<h1><a class="list-title" href="/top-100/{{year}}">{{list_title}}</a></h1>
+<hr>
+
+{% for song in songs %}
+<p class="list-item">#{{song.ordering}}: {{song.title}} - {% for artist in song.artists %}<a href="/artist/{{artist.id}}">{{artist.name}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+
+
+{% endfor %}
+{% endblock %}

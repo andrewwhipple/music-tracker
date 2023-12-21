@@ -6,21 +6,20 @@ from music_tracker.tracker.models import (
     Artist,
     ObsessionList,
     ObsessionSongs,
+    SpotifyTop100List,
     TopTenAlbumsList,
 )
 
 
 def index(request):
-    most_recent_top_ten = (
-        TopTenAlbumsList.objects.filter(published=True).order_by("-year").first()
-    )
+    most_recent_top_ten = TopTenAlbumsList.get_most_recent()
 
     return redirect("top_ten", year=most_recent_top_ten.year)
 
 
 def get_navigation_links():
-    top_ten_lists = TopTenAlbumsList.objects.filter(published=True).order_by("year")
-    obsessions_lists = ObsessionList.objects.filter(published=True).order_by("year")
+    top_ten_lists = TopTenAlbumsList.get_published().order_by("year")
+    obsessions_lists = ObsessionList.get_published().order_by("year")
 
     top_ten_links = [
         {
@@ -49,9 +48,8 @@ def get_navigation_links():
 def top_ten_list(request, year):
     list_record = get_object_or_404(TopTenAlbumsList, year=year, published=True)
 
-    albums = Album.objects.filter(year=year, rank__isnull=False)
-    top_ten_records = albums.filter(rank__lt=11).order_by("rank")
-    honorable_mentions_records = albums.filter(rank__gt=10).order_by("rank")
+    top_ten_records = Album.get_top_ten(year)
+    honorable_mentions_records = Album.get_honorable_mentions(year)
 
     context = {
         "list_title": list_record.title,
@@ -82,10 +80,6 @@ def obsessions_list(request, year):
 
     list_record = get_object_or_404(ObsessionList, year=year, published=True)
 
-    obsession_songs = ObsessionSongs.objects.filter(
-        obsession_list=list_record.id
-    ).order_by("ordering")
-
     context = {
         "list_title": list_record.title,
         "year": list_record.year,
@@ -96,7 +90,7 @@ def obsessions_list(request, year):
                     artist for artist in obsession.song.artists.all().order_by("name")
                 ],
             }
-            for obsession in obsession_songs.all()
+            for obsession in list_record.get_songs().all()
         ],
         "navigation": get_navigation_links(),
     }
@@ -104,8 +98,30 @@ def obsessions_list(request, year):
     return render(request, "tracker/obsessions.html", context)
 
 
+def spotify_top_100_list(request, year):
+    list_record = get_object_or_404(SpotifyTop100List, year=year, published=True)
+
+    context = {
+        "list_title": list_record.title,
+        "year": list_record.year,
+        "songs": [
+            {
+                "title": entry.song.title,
+                "artists": [
+                    artist for artist in entry.song.artists.all().order_by("name")
+                ],
+                "ordering": entry.ordering,
+            }
+            for entry in list_record.get_songs().all()
+        ],
+        "navigation": get_navigation_links(),
+    }
+
+    return render(request, "tracker/top-100.html", context)
+
+
 def obsessions_stats(request):
-    all_songs = ObsessionSongs.objects.filter(obsession_list__published=True)
+    all_songs = ObsessionSongs.get_songs()
     by_artist = all_songs.values("song__artists__name", "song__artists__id")
 
     song_count = by_artist.annotate(Count("song_id", distinct=True)).order_by(
@@ -142,28 +158,10 @@ def obsessions_stats(request):
 
 
 def artist_stats(request, id):
-    artist_record = get_object_or_404(Artist, id=id)
-
-    # Show a table of each top ten year and whether they have albums in the list or honorable mentions
-    albums = Album.objects.filter(artists=artist_record.id, listened=True)
-    published_top_tens = list(
-        TopTenAlbumsList.objects.filter(published=True).values_list("year", flat=True)
-    )
-
-    charted = albums.filter(rank__lt=11, year__in=published_top_tens).order_by(
-        "year", "rank"
-    )
-    honorable_mentions = albums.filter(
-        rank__isnull=False, rank__gt=10, year__in=published_top_tens
-    ).order_by("year", "rank")
-    other_albums = albums.filter(
-        rank__isnull=True, year__in=published_top_tens
-    ).order_by("year", "title")
+    artist = get_object_or_404(Artist, id=id)
 
     # Show a table of which years they have songs on the obsessions list
-    obsession_list_songs = ObsessionSongs.objects.filter(
-        obsession_list_id__published=True, song__artists=artist_record.id
-    ).order_by()
+    obsession_list_songs = artist.get_obsession_list_songs()
 
     song_count = obsession_list_songs.aggregate(Count("song_id", distinct=True))
     list_count = obsession_list_songs.aggregate(
@@ -176,8 +174,8 @@ def artist_stats(request, id):
     )
 
     context = {
-        "artist_name": artist_record.name,
-        "artist_id": artist_record.id,
+        "artist_name": artist.name,
+        "artist_id": artist.id,
         "albums": {
             "charted": [
                 {
@@ -185,21 +183,21 @@ def artist_stats(request, id):
                     "year": album.year,
                     "rank": album.rank,
                 }
-                for album in charted.all()
+                for album in artist.get_top_ten_albums().all()
             ],
             "honorable_mentions": [
                 {
                     "title": album.title,
                     "year": album.year,
                 }
-                for album in honorable_mentions.all()
+                for album in artist.get_honorable_mention_albums().all()
             ],
             "other_albums": [
                 {
                     "title": album.title,
                     "year": album.year,
                 }
-                for album in other_albums
+                for album in artist.get_other_albums().all()
             ],
         },
         "obsessions": {

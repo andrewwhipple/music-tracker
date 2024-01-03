@@ -14,6 +14,7 @@ class AlbumAdmin(admin.ModelAdmin):
         "priority",
         "original_rating",
         "rank",
+        "release_date",
     ]
     list_editable = ["listened", "priority", "original_rating", "rank"]
     list_filter = ["year", "listened", "priority"]

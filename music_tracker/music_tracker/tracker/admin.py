@@ -18,11 +18,13 @@ class AlbumAdmin(admin.ModelAdmin):
     ]
     list_editable = ["listened", "priority", "original_rating", "rank"]
     list_filter = ["year", "listened", "priority"]
+    search_fields = ["title", "artists__name"]
 
 
 @admin.register(models.Artist)
 class ArtistAdmin(admin.ModelAdmin):
     list_display = ["name"]
+    search_fields = ["name"]
 
 
 @admin.register(models.TopTenAlbumsList)
@@ -34,6 +36,7 @@ class TopTenAlbumsListAdmin(admin.ModelAdmin):
 @admin.register(models.Song)
 class SongAdmin(admin.ModelAdmin):
     list_display = ["title", "album", "display_artists"]
+    search_fields = ["title", "artists__name"]
 
 
 @admin.register(models.ObsessionList)

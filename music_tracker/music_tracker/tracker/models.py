@@ -58,6 +58,14 @@ class Artist(models.Model):
     def get_obsession_list_songs(self):
         return ObsessionSongs.get_songs().filter(song__artists=self.id)
 
+    def get_published_album_ranking(self):
+        try:
+            return (
+                self.artistalbumranking if self.artistalbumranking.published else None
+            )
+        except ArtistAlbumRanking.DoesNotExist:
+            return None
+
 
 class Album(models.Model):
     id = UUIDPKField()
@@ -178,3 +186,33 @@ class SpotifyTop100Songs(models.Model):
 
     class Meta:
         unique_together = [("ordering", "top_100_list"), ("song", "top_100_list")]
+
+
+class ArtistAlbumRanking(models.Model):
+    id = UUIDPKField()
+    artist = models.OneToOneField(Artist, on_delete=models.CASCADE)
+    published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.artist.name} - Album Ranking"
+
+    def get_ranked_albums(self):
+        return ArtistAlbumRankingEntry.objects.filter(ranking=self).order_by("rank")
+
+
+class ArtistAlbumRankingEntry(models.Model):
+    id = UUIDPKField()
+    ranking = models.ForeignKey(ArtistAlbumRanking, on_delete=models.CASCADE)
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
+    rank = models.IntegerField()
+    notes = models.TextField(
+        blank=True, null=True, help_text="Optional notes about this album's ranking"
+    )
+
+    def __str__(self) -> str:
+        return f"#{self.rank} - {self.album.title}"
+
+    class Meta:
+        unique_together = [("ranking", "rank"), ("ranking", "album")]

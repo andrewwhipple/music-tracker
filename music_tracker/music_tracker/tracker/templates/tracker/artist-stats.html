@@ -9,6 +9,20 @@
 
 <h2>Albums</h2>
 
+{% if album_ranking %}
+<h3>Album Rankings</h3>
+<ol>
+    {% for album in album_ranking.albums %}
+    <li>
+        {{album.title}} ({{album.year}})
+        {% if album.notes %}
+        <br><em>{{album.notes}}</em>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ol>
+{% endif %}
+
 <h3>Albums on top ten lists</h3>
 
 {% if albums.charted %}

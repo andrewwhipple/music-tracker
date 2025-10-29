@@ -173,9 +173,26 @@ def artist_stats(request, id):
         "obsession_list_id__year"
     )
 
+    # Get album ranking for this artist
+    album_ranking = artist.get_published_album_ranking()
+    ranking_data = None
+    if album_ranking:
+        ranking_data = {
+            "albums": [
+                {
+                    "title": entry.album.title,
+                    "year": entry.album.year,
+                    "rank": entry.rank,
+                    "notes": entry.notes,
+                }
+                for entry in album_ranking.get_ranked_albums()
+            ]
+        }
+
     context = {
         "artist_name": artist.name,
         "artist_id": artist.id,
+        "album_ranking": ranking_data,
         "albums": {
             "charted": [
                 {

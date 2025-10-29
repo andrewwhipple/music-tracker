@@ -1,25 +1,26 @@
 setup:
-	curl https://pyenv.run | bash
-	pyenv install 3.10
-	pyenv local 3.10
-	python -m pip install poetry
-	python -m poetry install
+	curl -LsSf https://astral.sh/uv/install.sh | sh
+	uv python install 3.12
+	uv sync
 	sudo apt install nginx
 
-poetry:
-	python -m poetry ${command}
+sync:
+	uv sync
 
 install-dependencies:
-	make poetry command=install
+	uv sync
+
+install-python:
+	uv python install 3.12
 
 add:
-	make poetry command="add ${dependency}"
+	uv add ${dependency}
 
-poetry-run:
-	make poetry command="run ${command}"
+uv-run:
+	uv run ${command}
 
 manage:
-	make poetry-run command="python music_tracker/manage.py ${command}"
+	make uv-run command="python music_tracker/manage.py ${command}"
 
 statics:
 	make manage command=collectstatic
@@ -40,7 +41,7 @@ env:
 	echo "run bash env.sh"
 
 pre-commit:
-	make poetry-run command="pre-commit"
+	make uv-run command="pre-commit"
 
 conf:
 	# Run make env first
@@ -50,7 +51,7 @@ conf-symlink:
 	sudo ln -s /etc/nginx/sites-available/music_tracker_nginx.conf /etc/nginx/sites-enabled/
 
 uwsgi:
-	make poetry-run command="uwsgi --socket :${DJANGO_PORT} --chdir music_tracker/ --module music_tracker.wsgi &"
+	make uv-run command="uwsgi --socket :${DJANGO_PORT} --chdir music_tracker/ --module music_tracker.wsgi &"
 
 start:
 	service nginx restart
@@ -59,4 +60,4 @@ start:
 find-uwsgi:
 	ps -u root | grep uwsgi
 
-.PHONY: setup, poetry, install-dependencies, add, manage, statics, runserver, superuser, env, pre-commit, conf, conf-symlink, uwsgi, start, find-uwsgi
+.PHONY: setup, sync, install-dependencies, install-python, add, manage, statics, runserver, superuser, env, pre-commit, conf, conf-symlink, uwsgi, start, find-uwsgi

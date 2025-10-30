@@ -8,4 +8,5 @@ urlpatterns = [
     path("obsessions/<str:year>", views.obsessions_list, name="obsessions"),
     path("artist/<str:id>", views.artist_stats, name="artist_stats"),
     path("top-100/<str:year>", views.spotify_top_100_list, name="spotify_top_100"),
+    path("top-100-stats/", views.spotify_top_100_stats, name="spotify_top_100_stats"),
 ]

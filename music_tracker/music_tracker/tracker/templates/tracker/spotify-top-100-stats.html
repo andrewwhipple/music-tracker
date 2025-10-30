@@ -1,0 +1,75 @@
+{% extends "tracker/index.html" %}
+
+{% block page_title %}{{page_title}}{% endblock %}
+
+{% block content %}
+<h1>{{page_title}}</h1>
+<hr>
+
+{% if years_data %}
+<div class="stats-tables">
+    {% for year in years_data %}
+    <div class="year-table">
+        <h2>{{year.year}}</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Artist</th>
+                    <th>Songs</th>
+                    {% if not year.is_first_year %}
+                    <th>Previous</th>
+                    <th>Change</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for artist in year.artists %}
+                <tr>
+                    <td><a href="/artist/{{artist.id}}">{{artist.name}}</a></td>
+                    <td>{{artist.current_count}}</td>
+                    {% if not year.is_first_year %}
+                    <td>{{artist.previous_count}}</td>
+                    <td class="change-value {% if artist.change > 0 %}positive{% elif artist.change < 0 %}negative{% else %}neutral{% endif %}">
+                        {% if artist.change > 0 %}+{{artist.change}}{% else %}{{artist.change}}{% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><strong>Total unique artists:</strong> {{year.total_artists}}</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if years_groups %}
+<div class="years-groups-section">
+    <h2>Artists by Number of Years</h2>
+    <table class="years-groups-table">
+        <thead>
+            <tr>
+                {% for club in years_groups %}
+                <th>{{club.num_years}} Years Club</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="years-groups-row">
+                {% for group in years_groups %}
+                <td class="years-group-column">
+                    {% for artist in group.artists %}
+                    <div class="artist-name"><a href="/artist/{{artist.id}}">{{artist.name}}</a></div>
+                    {% empty %}
+                    <div class="no-artists">No artists</div>
+                    {% endfor %}
+                </td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% else %}
+<p>No published Spotify Top 100 lists found.</p>
+{% endif %}
+{% endblock %}

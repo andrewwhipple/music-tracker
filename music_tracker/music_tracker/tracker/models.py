@@ -138,10 +138,16 @@ class Song(models.Model):
     artists = models.ManyToManyField(Artist, null=True, blank=True, default=None)
 
     def __str__(self) -> str:
-        return self.title
+        return self.display_full_info()
 
     def display_artists(self):
         return ", ".join([str(a) for a in self.artists.all()])
+
+    def display_full_info(self):
+        """Display song as 'Title - Artist (Album)'"""
+        artists = self.display_artists()
+        album_part = f" ({self.album.title})" if self.album else ""
+        return f"{self.title} - {artists}{album_part}"
 
 
 class ObsessionList(List):

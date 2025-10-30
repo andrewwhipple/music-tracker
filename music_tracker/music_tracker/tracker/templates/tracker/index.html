@@ -26,6 +26,18 @@
                     {% for link in navigation.obsessions %} <li><a href="/obsessions/{{link.year}}">{{link.title}}</a></li> {% endfor %}
                 </ul>
                 {% endif %}
+                {% if nav_category == "spotify_top_100" %}
+                <summary aria-haspopup="listbox" role="link">Spotify Top 100</summary>
+                <ul role="listbox">
+                    {% for link in navigation.spotify_top_100 %}
+                      {% if link.year == "stats" %}
+                        <li><a href="/top-100-stats/">{{link.title}}</a></li>
+                      {% else %}
+                        <li><a href="/top-100/{{link.year}}">{{link.title}}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
               </details>
             </li>
             {% endfor %}

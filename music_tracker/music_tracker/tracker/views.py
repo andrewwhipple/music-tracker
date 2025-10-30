@@ -7,6 +7,7 @@ from music_tracker.tracker.models import (
     ObsessionList,
     ObsessionSongs,
     SpotifyTop100List,
+    SpotifyTop100Songs,
     TopTenAlbumsList,
 )
 
@@ -20,6 +21,7 @@ def index(request):
 def get_navigation_links():
     top_ten_lists = TopTenAlbumsList.get_published().order_by("year")
     obsessions_lists = ObsessionList.get_published().order_by("year")
+    spotify_lists = SpotifyTop100List.get_published().order_by("year")
 
     top_ten_links = [
         {
@@ -39,9 +41,20 @@ def get_navigation_links():
 
     obsession_links.append({"title": "Obsession Stats", "year": "stats"})
 
+    spotify_links = [
+        {
+            "title": list.title,
+            "year": list.year,
+        }
+        for list in spotify_lists
+    ]
+
+    spotify_links.append({"title": "Spotify Top 100 Stats", "year": "stats"})
+
     return {
         "top_tens": top_ten_links,
         "obsessions": obsession_links,
+        # "spotify_top_100": spotify_links,
     }
 
 
@@ -232,3 +245,115 @@ def artist_stats(request, id):
     }
 
     return render(request, "tracker/artist-stats.html", context)
+
+
+def spotify_top_100_stats(request):
+    # Get all published Spotify Top 100 lists ordered by year
+    published_lists = SpotifyTop100List.get_published().order_by("year")
+
+    if not published_lists.exists():
+        context = {
+            "page_title": "Spotify Top 100 Stats",
+            "years_data": [],
+            "navigation": get_navigation_links(),
+        }
+        return render(request, "tracker/spotify-top-100-stats.html", context)
+
+    years_data = []
+    previous_year_data = {}  # Store artist song counts from the previous year
+    all_artists_by_years = {}  # Track which artists appear in which years
+
+    for current_list in published_lists:
+        # Get all songs for this year's list
+        songs_this_year = (
+            SpotifyTop100Songs.objects.filter(top_100_list=current_list)
+            .select_related("song")
+            .prefetch_related("song__artists")
+        )
+
+        # Count songs per artist for this year
+        artist_counts = {}
+        for song_entry in songs_this_year:
+            for artist in song_entry.song.artists.all():
+                if artist.id not in artist_counts:
+                    artist_counts[artist.id] = {"name": artist.name, "count": 0}
+                artist_counts[artist.id]["count"] += 1
+
+                # Track this artist for the years club calculation
+                if artist.id not in all_artists_by_years:
+                    all_artists_by_years[artist.id] = {
+                        "name": artist.name,
+                        "years": set(),
+                    }
+                all_artists_by_years[artist.id]["years"].add(current_list.year)
+
+        # Create the data structure for this year
+        year_data = {
+            "year": current_list.year,
+            "is_first_year": len(years_data) == 0,
+            "artists": [],
+        }
+
+        # Create artist entries with previous year comparison
+        for artist_id, data in artist_counts.items():
+            artist_entry = {
+                "name": data["name"],
+                "id": artist_id,
+                "current_count": data["count"],
+                "previous_count": previous_year_data.get(artist_id, {}).get("count", 0),
+            }
+
+            # Calculate change (only meaningful if not the first year)
+            if not year_data["is_first_year"]:
+                artist_entry["change"] = (
+                    artist_entry["current_count"] - artist_entry["previous_count"]
+                )
+
+            year_data["artists"].append(artist_entry)
+
+        # Sort artists by count (descending) then name (ascending)
+        year_data["artists"].sort(key=lambda x: (-x["current_count"], x["name"]))
+
+        # Count unique artists for this year
+        year_data["total_artists"] = len(artist_counts)
+
+        years_data.append(year_data)
+
+        # Store this year's data for next iteration
+        previous_year_data = artist_counts
+
+    # Calculate years groups data
+    total_published_lists = len(published_lists)
+    years_groups = {}
+
+    for artist_id, artist_data in all_artists_by_years.items():
+        num_years = len(artist_data["years"])
+        if num_years >= 2:  # Only include artists with 2+ years
+            if num_years not in years_groups:
+                years_groups[num_years] = []
+            years_groups[num_years].append(
+                {"name": artist_data["name"], "id": artist_id}
+            )
+
+    # Sort artists alphabetically within each group
+    for num_years in years_groups:
+        years_groups[num_years].sort(key=lambda x: x["name"])
+
+    # Create ordered list of groups (2 years through total years)
+    ordered_groups = []
+    for num_years in range(2, total_published_lists + 1):
+        if num_years in years_groups:
+            ordered_groups.append(
+                {"num_years": num_years, "artists": years_groups[num_years]}
+            )
+        else:
+            ordered_groups.append({"num_years": num_years, "artists": []})
+
+    context = {
+        "page_title": "Spotify Top 100 Stats",
+        "years_data": years_data,
+        "years_groups": ordered_groups,
+        "navigation": get_navigation_links(),
+    }
+
+    return render(request, "tracker/spotify-top-100-stats.html", context)

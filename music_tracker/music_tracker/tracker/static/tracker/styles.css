@@ -42,3 +42,111 @@
 h1, h4 {
     --typography-spacing-vertical: 1rem;
 }
+
+/* Spotify Top 100 Stats Styles */
+.stats-tables {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.year-table {
+    flex: 1;
+    min-width: 300px;
+    max-width: 450px;
+}
+
+.year-table h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.year-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.year-table th,
+.year-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.year-table th {
+    background-color: var(--pico-table-border-color);
+    font-weight: bold;
+}
+
+.change-value.positive {
+    color: #22c55e;
+    font-weight: bold;
+}
+
+.change-value.negative {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.change-value.neutral {
+    color: var(--pico-muted-color);
+}
+
+.years-groups-section {
+    margin-top: 3rem;
+}
+
+.years-groups-section h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.years-groups-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.years-groups-table th {
+    padding: 1rem;
+    text-align: center;
+    background-color: var(--pico-table-border-color);
+    font-weight: bold;
+    border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.years-groups-row {
+    vertical-align: top;
+}
+
+.years-group-column {
+    padding: 1rem;
+    border-right: 1px solid var(--pico-muted-border-color);
+    width: calc(100% / var(--club-count, 2));
+}
+
+.years-group-column:last-child {
+    border-right: none;
+}
+
+.artist-name {
+    margin-bottom: 0.5rem;
+}
+
+.no-artists {
+    color: var(--pico-muted-color);
+    font-style: italic;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .stats-tables {
+        flex-direction: column;
+    }
+
+    .year-table {
+        max-width: 100%;
+    }
+}
